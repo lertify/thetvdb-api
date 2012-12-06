@@ -1,0 +1,21 @@
+{
+    "name": "lertify/tmdb-api",
+    "type": "library",
+    "description": "TMDb API v3 client",
+    "homepage": "https://github.com/lertify/tmdb-api",
+    "keywords": ["tmdb", "api"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lertify Team",
+            "homepage": "http://lertify.me"
+        }
+    ],
+    "require": {
+        "php":                ">=5.3.2",
+        "ext-curl":           "*"
+    },
+    "autoload": {
+        "psr-0": { "Lertify\\TMDb\\": "src/" }
+    }
+}

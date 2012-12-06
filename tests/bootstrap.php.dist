@@ -1,0 +1,6 @@
+<?php
+
+require_once __DIR__.'/SplClassLoader.php';
+
+$loader = new SplClassLoader('Lertify\TheTVDB', __DIR__.'/../src');
+$loader->register();
