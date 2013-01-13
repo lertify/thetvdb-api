@@ -97,10 +97,7 @@ class Client
             throw new Exception\InvalidResponseException( 'Connection error or incorrect response' );
         }
 
-        $response = (array) $response;
-        $response = json_decode(json_encode($response, JSON_HEX_TAG), true);
-        $response = $this->array_change_key_case_recursive($response, CASE_LOWER);
-        return $response;
+        return $this->xmlToArray($response);
     }
 
     /**
@@ -173,25 +170,37 @@ class Client
     }
 
     /**
-     * A recursive array_change_key_case function.
-     * @param array $input
-     * @param integer $case
+     * Convert xml to array
+     *
+     * @param \SimpleXMLElement $xml
+     * @return array
      */
-    protected function array_change_key_case_recursive($input, $case = null) {
+    protected function xmlToArray($xml) {
+        $array = (array) $xml;
+        $array = json_decode(json_encode($array, JSON_HEX_TAG), true);
+        $array = $this->arrayChangeCase($array, CASE_LOWER);
+        return $array;
+    }
+
+    /**
+     * Change array key case recursively
+     *
+     * @param array $input
+     * @param integer $case CASE_UPPER or CASE_LOWER
+     * @throws \Exception
+     * @return array
+     */
+    protected function arrayChangeCase($input, $case = CASE_LOWER) {
         if(!is_array($input)){
-            trigger_error("Invalid input array '{$input}'",E_USER_NOTICE); exit;
-        }
-        // CASE_UPPER|CASE_LOWER
-        if(null === $case){
-            $case = CASE_LOWER;
+            throw new \Exception("Invalid input, should be array");
         }
         if(!in_array($case, array(CASE_UPPER, CASE_LOWER))){
-            trigger_error("Case parameter '{$case}' is invalid.", E_USER_NOTICE); exit;
+            throw new \Exception("Case is invalid");
         }
         $input = array_change_key_case($input, $case);
         foreach($input as $key=>$array){
             if(is_array($array)){
-                $input[$key] = $this->array_change_key_case_recursive($array, $case);
+                $input[$key] = $this->arrayChangeCase($array, $case);
             }
         }
         return $input;
