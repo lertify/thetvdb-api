@@ -1,9 +1,9 @@
 {
-    "name": "lertify/tmdb-api",
+    "name": "lertify/thetvdb-api",
     "type": "library",
-    "description": "TMDb API v3 client",
-    "homepage": "https://github.com/lertify/tmdb-api",
-    "keywords": ["tmdb", "api"],
+    "description": "TheTVDB API client",
+    "homepage": "https://github.com/lertify/thetvdb-api",
+    "keywords": ["thetvdb", "api"],
     "license": "MIT",
     "authors": [
         {
@@ -16,6 +16,6 @@
         "ext-curl":           "*"
     },
     "autoload": {
-        "psr-0": { "Lertify\\TMDb\\": "src/" }
+        "psr-0": { "Lertify\\TheTVDB\\": "src/" }
     }
 }
