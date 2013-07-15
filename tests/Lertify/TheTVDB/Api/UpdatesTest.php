@@ -35,7 +35,10 @@ class UpdatesTest extends \PHPUnit_Framework_TestCase
     public function testGetByPeriod()
     {
         $updates = $this->object->updates()->getByPeriod();
+
         $this->assertInstanceOf('Lertify\TheTVDB\Api\Data\Updates\Updates', $updates, 'Item not instance of Updates');
+        //This test will fail until a bug in the deserializer is fixed: https://github.com/schmittjoh/serializer/pull/89
+        //$this->assertInstanceOf('\DateTime', $updates->getTime(), 'Updates time not instance of DateTime');
         $this->assertInstanceOf('Lertify\TheTVDB\Api\Data\ArrayCollection', $updates->getSeries(), 'Series list not instance of ArrayCollection');
         $this->assertInstanceOf('Lertify\TheTVDB\Api\Data\Updates\Series', $updates->getSeries()->first(), 'Series list item not instance of Series');
         $this->assertInstanceOf('Lertify\TheTVDB\Api\Data\ArrayCollection', $updates->getEpisodes(), 'Episodes list not instance of ArrayCollection');

@@ -3,7 +3,6 @@
 namespace Lertify\TheTVDB\Tests\Api;
 
 use Lertify\TheTVDB\Client;
-use Exception;
 
 class EpisodeTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,6 +48,7 @@ class EpisodeTest extends \PHPUnit_Framework_TestCase
     public function testGetListBySeriesId()
     {
         $list = $this->object->episode()->getListBySeriesId(73739);
+
         $this->assertInstanceOf('Lertify\TheTVDB\Api\Data\ArrayCollection', $list, 'List not instance of ArrayCollection');
         $this->assertInstanceOf('Lertify\TheTVDB\Api\Data\Episode\Episode', $list->first(), 'List item not instance of Episode');
     }

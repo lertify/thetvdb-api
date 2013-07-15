@@ -6,6 +6,11 @@ use Lertify\TheTVDB\Exception;
 use Lertify\TheTVDB\Api\Data\Language AS Data;
 use Lertify\TheTVDB\Api\Data\ArrayCollection;
 
+/**
+ * Class Language
+ * @package Lertify\TheTVDB\Api
+ * @description Language api
+ */
 class Language extends AbstractApi
 {
 
@@ -16,16 +21,9 @@ class Language extends AbstractApi
      *
      * @return ArrayCollection
      */
-    public function getList() {
-        $results = $this->get(':apikey/languages.xml');
-
-        $list = new ArrayCollection();
-
-        foreach( $results['language'] AS $language) {
-            $list->add( new Data\Language( $language ) );
-        }
-
-        return $list;
+    public function getList()
+    {
+        return $this->get('Language\LanguageCollection', ':apikey/languages.xml');
     }
 
 }

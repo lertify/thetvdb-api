@@ -6,6 +6,11 @@ use Lertify\TheTVDB\Exception;
 use Lertify\TheTVDB\Api\Data\User AS Data;
 use Lertify\TheTVDB\Api\Data\ArrayCollection;
 
+/**
+ * Class User
+ * @package Lertify\TheTVDB\Api
+ * @description User api
+ */
 class User extends AbstractApi
 {
 
@@ -16,32 +21,25 @@ class User extends AbstractApi
      *
      * @param $account_id user account id
      * @param string $series_id series id
+     *
      * @return ArrayCollection
      */
-    public function getRating($account_id, $series_id = '') {
-        $results = $this->get('GetRatingsForUser.php?apikey=:apikey', array('accountid' => $account_id, 'seriesid' => $series_id));
-
-        $list = new ArrayCollection();
-
-        foreach( $results AS $series) {
-            $list->add( new Data\Series( $series ) );
-        }
-
-        return $list;
+    public function getRating($account_id, $series_id = '')
+    {
+        return $this->get('User\RatingCollection', 'GetRatingsForUser.php?apikey=:apikey', array('accountid' => $account_id, 'seriesid' => $series_id));
     }
 
     /**
-     * Get user prefered language
+     * Get user preferred language
      *
      * @link http://www.thetvdb.com/wiki/index.php/API:User_PreferredLanguage
      *
      * @param $account_id user account id
      * @return Data\Language|null
      */
-    public function getPreferredLanguages($account_id) {
-        $result = $this->get('User_PreferredLanguage.php', array('accountid' => $account_id));
-        if(!isset($result['language'])) return null;
-        return new Data\Language( $result['language'] );
+    public function getPreferredLanguage($account_id)
+    {
+        return $this->get('User\Language<single>', 'User_PreferredLanguage.php', array('accountid' => $account_id));
     }
 
     /**
@@ -50,19 +48,11 @@ class User extends AbstractApi
      * @link http://www.thetvdb.com/wiki/index.php/API:User_Favorites
      *
      * @param $account_id user account id
-     * @return ArrayCollection
+     * @return Data\Favorites
      */
-    public function getFavorites($account_id) {
-        $results = $this->get('User_Favorites.php', array('accountid' => $account_id));
-
-        $list = new ArrayCollection();
-
-        foreach( $results['series'] AS $data) {
-            if(empty($data)) continue;
-            $list->add($data);
-        }
-
-        return $list;
+    public function getFavorites($account_id)
+    {
+        return $this->get('User\Favorites', 'User_Favorites.php', array('accountid' => $account_id));
     }
 
     /**
@@ -72,21 +62,11 @@ class User extends AbstractApi
      *
      * @param $account_id user account id
      * @param $series_id series id
-     * @return ArrayCollection|null
+     * @return Data\Favorites
      */
-    public function addFavorite($account_id, $series_id) {
-        $result = $this->get('User_Favorites.php', array('accountid' => $account_id, 'type' => 'add', 'seriesid' => $series_id));
-
-        if(!isset($result['series'])) return null;
-
-        $list = new ArrayCollection();
-
-        foreach( $result['series'] AS $data) {
-            if(empty($data)) continue;
-            $list->add($data);
-        }
-
-        return $list;
+    public function addFavorite($account_id, $series_id)
+    {
+        return $this->get('User\Favorites', 'User_Favorites.php', array('accountid' => $account_id, 'type' => 'add', 'seriesid' => $series_id));
     }
 
     /**
@@ -96,21 +76,11 @@ class User extends AbstractApi
      *
      * @param $account_id user account id
      * @param $series_id series id
-     * @return ArrayCollection|null
+     * @return Data\Favorites
      */
-    public function removeFavorite($account_id, $series_id) {
-        $result = $this->get('User_Favorites.php', array('accountid' => $account_id, 'type' => 'remove', 'seriesid' => $series_id));
-
-        if(!isset($result['series'])) return null;
-
-        $list = new ArrayCollection();
-
-        foreach( $result['series'] AS $data) {
-            if(empty($data)) continue;
-            $list->add($data);
-        }
-
-        return $list;
+    public function removeFavorite($account_id, $series_id)
+    {
+        return $this->get('User\Favorites', 'User_Favorites.php', array('accountid' => $account_id, 'type' => 'remove', 'seriesid' => $series_id));
     }
 
     /**
@@ -123,11 +93,9 @@ class User extends AbstractApi
      * @param $rating series rating
      * @return float|null
      */
-    public function postSeriesRating($account_id, $series_id, $rating) {
-        $result = $this->postRating($account_id, 'series', $series_id, $rating);
-
-        if(!isset($result['series'])) return null;
-        return (float) $result['series']['rating'];
+    public function postSeriesRating($account_id, $series_id, $rating)
+    {
+        return $this->postRating($account_id, 'series', $series_id, $rating);
     }
 
     /**
@@ -140,11 +108,9 @@ class User extends AbstractApi
      * @param $rating episode rating
      * @return float|null
      */
-    public function postEpisodeRating($account_id, $episode_id, $rating) {
-        $result = $this->postRating($account_id, 'episode', $episode_id, $rating);
-
-        if(!isset($result['episode'])) return null;
-        return (float) $result['episode']['rating'];
+    public function postEpisodeRating($account_id, $episode_id, $rating)
+    {
+        return $this->postRating($account_id, 'episode', $episode_id, $rating);
     }
 
     /**
@@ -158,8 +124,9 @@ class User extends AbstractApi
      * @param $rating
      * @return object
      */
-    protected function postRating($account_id, $item_type, $item_id, $rating) {
-        return $this->get('User_Rating.php', array('accountid' => $account_id, 'itemtype' => $item_type, 'itemid' => $item_id, 'rating' => $rating));
+    protected function postRating($account_id, $item_type, $item_id, $rating)
+    {
+        return $this->get('User\Rating<single>', 'User_Rating.php', array('accountid' => $account_id, 'itemtype' => $item_type, 'itemid' => $item_id, 'rating' => $rating));
     }
 
 }

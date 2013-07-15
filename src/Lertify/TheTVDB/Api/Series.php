@@ -6,7 +6,6 @@ use Lertify\TheTVDB\Exception;
 use Lertify\TheTVDB\Api\Data\Series AS Data;
 use Lertify\TheTVDB\Api\Data\Episode AS EpisodeData;
 use Lertify\TheTVDB\Api\Data\ArrayCollection;
-use Lertify\TheTVDB\Api\Data\PagedCollection;
 use Lertify\TheTVDB\Exception\NotFoundException;
 
 class Series extends AbstractApi
@@ -19,105 +18,101 @@ class Series extends AbstractApi
      *
      * @param string $name series name
      * @param string $language language
-     * @return ArrayCollection
+     * @return ArrayCollection<Data\Series>
      */
-    public function getByName($name, $language = 'en') {
-        $results = $this->get('GetSeries.php', array('seriesname' => $name, 'language' => $language));
-
-        $list = new ArrayCollection();
-
-        foreach( $results['series'] AS $series) {
-            $list->add( new Data\Series( $series ) );
-        }
-
-        return $list;
+    public function getByName($name, $language = 'en')
+    {
+        return $this->get('Series\SeriesCollection', 'GetSeries.php', array('seriesname' => $name, 'language' => $language));
     }
 
     /**
      * Get series by IMDB id
      *
-     * @link http://www.thetvdb.com/wiki/index.php/API:GetSeries
+     * @link http://www.thetvdb.com/wiki/index.php/API:GetSeriesByRemoteID
      *
      * @param string $id IMDB id
      * @return Data\Series
      * @throws NotFoundException
      */
-    public function getByImdb($id) {
-        $result = $this->get('GetSeriesByRemoteID.php', array('imdbid' => $id));
-        if(!isset($result['series'])) throw new NotFoundException('Series not found');
-        return new Data\Series( $result['series'] );
+    public function getByImdb($id)
+    {
+        /** @var Data\Series $series */
+        $series = $this->get('Series\Series<single>', 'GetSeriesByRemoteID.php', array('imdbid' => $id));
+
+        if (null === $series->getId()) {
+            throw new NotFoundException(sprintf('Series not found by IMDB id %s', $id));
+        }
+
+        return $series;
     }
 
     /**
      * Get series by Zap2It id
      *
-     * @link http://www.thetvdb.com/wiki/index.php/API:GetSeries
+     * @link http://www.thetvdb.com/wiki/index.php/API:GetSeriesByRemoteID
      *
-     * @param $id zap2it id
+     * @param integer $id zap2it id
      * @return Data\Series
      * @throws NotFoundException
      */
-    public function getByZap2It($id) {
-        $result = $this->get('GetSeriesByRemoteID.php', array('zap2it' => $id));
-        if(!isset($result['series'])) throw new NotFoundException('Series not found');
-        return new Data\Series( $result['series'] );
+    public function getByZap2It($id)
+    {
+        /** @var Data\Series $series */
+        $series = $this->get('Series\Series<single>', 'GetSeriesByRemoteID.php', array('zap2it' => $id));
+
+        if (null === $series->getId()) {
+            throw new NotFoundException(sprintf('Series not found by IMDB id %s', $id));
+        }
+
+        return $series;
     }
 
     /**
      * Get series info
      *
-     * @link http://www.thetvdb.com/wiki/index.php?title=Programmers_API
+     * @link http://www.thetvdb.com/wiki/index.php/API:Base_Series_Record
      *
      * @param $series_id series id
      * @param string $language language
-     * @return Data\SeriesInfo|null
+     * @throws NotFoundException
+     * @return Data\SeriesInfo
      */
-    public function getInfo($series_id, $language = 'en') {
-        $result = $this->get(':apikey/series/:seriesid/:language.xml', array(':seriesid' => $series_id, ':language' => $language));
-        if(!isset($result['series'])) return null;
-        return new Data\SeriesInfo( $result['series'] );
+    public function getInfo($series_id, $language = 'en')
+    {
+        /** @var Data\SeriesInfo $series */
+        $series = $this->get('Series\SeriesInfo<single>', ':apikey/series/:seriesid/:language.xml', array(':seriesid' => $series_id, ':language' => $language));
+
+        if (null === $series->getId()) {
+            throw new NotFoundException(sprintf('Series not found by id %s ( %s )', $series_id, $language));
+        }
+
+        return $series;
     }
 
     /**
      * Get series banners
      *
-     * @link http://www.thetvdb.com/wiki/index.php?title=Programmers_API
+     * @link http://www.thetvdb.com/wiki/index.php/API:banners.xml
      *
      * @param $series_id series id
      * @return ArrayCollection
      */
-    public function getBanners($series_id) {
-        $results = $this->get(':apikey/series/:seriesid/banners.xml', array(':seriesid' => $series_id));
-        $list = new ArrayCollection();
-
-        if(!isset($results['banner'])) return $list;
-
-        foreach( $results['banner'] AS $banner) {
-            $list->add( new Data\Banner( $banner ) );
-        }
-
-        return $list;
+    public function getBanners($series_id)
+    {
+        return $this->get('Series\BannerCollection', ':apikey/series/:seriesid/banners.xml', array(':seriesid' => $series_id));
     }
 
     /**
      * Get series actors
      *
-     * @link http://www.thetvdb.com/wiki/index.php?title=Programmers_API
+     * @link http://www.thetvdb.com/wiki/index.php/API:actors.xml
      *
      * @param $series_id series id
      * @return ArrayCollection
      */
-    public function getActors($series_id) {
-        $results = $this->get(':apikey/series/:seriesid/actors.xml', array(':seriesid' => $series_id));
-        $list = new ArrayCollection();
-
-        if(!isset($results['actor'])) return $list;
-
-        foreach( $results['actor'] AS $actor) {
-            $list->add( new Data\Actor( $actor ) );
-        }
-
-        return $list;
+    public function getActors($series_id)
+    {
+        return $this->get('Series\ActorCollection', ':apikey/series/:seriesid/actors.xml', array(':seriesid' => $series_id));
     }
 
 }
